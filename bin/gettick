@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+require 'gli'
+begin # XXX: Remove this begin/rescue before distributing your app
+require 'gettick'
+rescue LoadError
+  STDERR.puts "In development, you need to use `bundle exec bin/gettick` to run your app"
+  STDERR.puts "At install-time, RubyGems will make sure lib, etc. are in the load path"
+  STDERR.puts "Feel free to remove this message from bin/gettick now"
+  exit 64
+end
+
+include GLI::App
+
+program_desc 'Gettick is a trading simulation'
+
+version Gettick::VERSION
+
+subcommand_option_handling :normal
+arguments :strict
+
+desc 'will reset your portfolio to default befor runing a command'
+switch [:r,:switch]
+
+
+desc 'search if a quotes exist'
+arg_name 'Describe arguments to lookup here'
+command :lookup do |c|
+  c.desc "Will print quote stock's market exchange"
+  c.switch :s
+  c.desc "Will print basic quote information"
+  c.switch :i
+
+  c.action do |global_options,options,args|
+    Gettick::lookup(global_options, options, args)
+  end
+end
+
+desc 'Use this to sell some quantity of a que in your portfolio'
+arg_name 'stock_symbole, quantity'
+command :sell do |c|
+  c.action do |global_options,options,args|
+    Gettick::sell(global_options, options, args) 
+  end
+end
+
+desc 'Use this to sell some quantity of a stock from your portfolio'
+arg_name 'stock_symbole, quantity'
+command :buy do |c|
+  c.action do |global_options,options,args|
+    Gettick::buy(global_options, options, args) 
+  end
+end
+
+pre do |global,command,options,args|
+  # if reset option is set run command with a new portfolio
+  Gettick::resetPortfolio if global[:r]
+  true
+end
+
+
+on_error do |exception|
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
+
+exit run(ARGV)
