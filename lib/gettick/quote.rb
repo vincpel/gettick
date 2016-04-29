@@ -17,9 +17,7 @@ class Quote
   end
 
   def exist?
-     #puts !(quotejson["quote"]["Ask"].nil?)
      !(@quote["quote"]["Ask"].nil?)
-     #!(quotejson["quote"]["symbol"]) && !(quotejson["quote"]["Ask"] == "")
   end
 
   def attribs

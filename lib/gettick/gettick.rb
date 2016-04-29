@@ -5,9 +5,6 @@ module Gettick
   end
 
   def self.lookup(global_options, options, args)
-    #puts global_options 
-    #p options
-    #p args
     args.each do |i|
       quote = Quote.new(pullatick i)
 
@@ -51,7 +48,6 @@ module Gettick
     end
     account -= qt.to_i * quote.price.to_f
 
-    # if account is negativ ...
     if account < 0 
       $stderr.puts("aborting ... your account would be under 0 !")
       return
@@ -71,7 +67,7 @@ module Gettick
     if title[quote.sym]
       title[quote.sym] -= qt
     else
-      title[quote.sym] = qt# quote not in porfiolio
+      title[quote.sym] = qt
     end
 
     
@@ -82,8 +78,6 @@ module Gettick
 
     account += qt.to_i * quote.price.to_f
     
-    # if you dont have enouf quotes to sell ... 
-
     saveportfolio(account, title)
     [account, title]
   end
@@ -99,23 +93,18 @@ module Gettick
       fo.puts newportfolio.to_json 
     end
   end
-  #title qt
-
 
   def self.list(global_options, options, args)
-    #File.open('.portfolio', 'w') { |qu| qu.puts qo.to_json }
     bar = JSON.parse(File.read('.portfolio'))
     puts bar
     puts bar["title"]["aapl"]
   end
 
   def self.pull
-    # ? op\topion display change 
 
   end
   def self.pullatick(atick)
     
-    #TODO raise if atik.nil?
     uri = "https://query.yahooapis.com/v1/public/yql?"+
               "q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20"+
               "in%20%28%22#{atick}%22%29%0A%09%09&"+
@@ -126,14 +115,9 @@ module Gettick
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     @data = http.get(uri.request_uri)
     
-    #TODO catch socket exceptionm 
-
     jtick = JSON.parse(@data.body)
-    #puts JSON.pretty_generate(jtick)
     
-    #puts extractQuoteFromJson jtick
     extractQuoteFromJson jtick
-
   end
 
   def self.extractQuoteFromJson(jsonquote)
@@ -145,9 +129,6 @@ module Gettick
   end
 
 end
-
-
-#https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20%28%22#{tick}%22%29%0A%09%09&env=http%3A%2F%2Fdatatables.org%2Falltables.env&format=json
 
 
 
